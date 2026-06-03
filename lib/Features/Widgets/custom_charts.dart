@@ -83,7 +83,7 @@ class _YearlyGraphChartState extends State<YearlyGraphChart>
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withValues(alpha: (0.03)),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -151,7 +151,7 @@ class _YearlyGraphChartState extends State<YearlyGraphChart>
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
+                  color: Colors.black.withValues(alpha: (0.03)),
                   blurRadius: 18,
                   offset: const Offset(0, 8),
                 ),
@@ -309,8 +309,8 @@ class _YearlySplinePainter extends CustomPainter {
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
         colors: [
-          primaryColor.withOpacity(0.24),
-          primaryColor.withOpacity(0.00),
+          primaryColor.withValues(alpha: (0.24)),
+          primaryColor.withValues(alpha: (0.00)),
         ],
       ).createShader(Rect.fromLTWH(0, 0, width, height));
 
@@ -332,7 +332,7 @@ class _YearlySplinePainter extends CustomPainter {
     final selectedY = points[selectedIndex].dy;
 
     final verticalLinePaint = Paint()
-      ..color = primaryColor.withOpacity(0.15)
+      ..color = primaryColor.withValues(alpha: (0.15))
       ..strokeWidth = 2.0
       ..strokeCap = StrokeCap.round;
 
@@ -355,7 +355,7 @@ class _YearlySplinePainter extends CustomPainter {
       if (isSelected) {
         // Glowing dot
         canvas.drawCircle(
-            p, 8.0, Paint()..color = primaryColor.withOpacity(0.25));
+            p, 8.0, Paint()..color = primaryColor.withValues(alpha: 0.25));
         canvas.drawCircle(p, 6.0, nodeOuterPaint);
         canvas.drawCircle(p, 4.0, Paint()..color = secondaryColor);
       } else {
@@ -558,7 +558,7 @@ class _MonthlyBarChartState extends State<MonthlyBarChart> {
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withValues(alpha: (0.03)),
                 blurRadius: 18,
                 offset: const Offset(0, 8),
               ),
@@ -610,16 +610,18 @@ class _MonthlyBarChartState extends State<MonthlyBarChart> {
                                               const Color(0xFF5C6BC0)
                                             ]
                                           : [
-                                              primaryColor.withOpacity(0.7),
-                                              primaryColor.withOpacity(0.4)
+                                              primaryColor.withValues(
+                                                  alpha: (0.7)),
+                                              primaryColor.withValues(
+                                                  alpha: (0.4))
                                             ],
                                     ),
                                     borderRadius: BorderRadius.circular(6),
                                     boxShadow: isSelected
                                         ? [
                                             BoxShadow(
-                                              color:
-                                                  primaryColor.withOpacity(0.3),
+                                              color: primaryColor.withValues(
+                                                  alpha: (0.3)),
                                               blurRadius: 6,
                                               offset: const Offset(0, 2),
                                             )
@@ -665,7 +667,7 @@ class _MonthlyBarChartState extends State<MonthlyBarChart> {
               borderRadius: BorderRadius.circular(22),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.03),
+                  color: Colors.black.withValues(alpha: (0.03)),
                   blurRadius: 18,
                   offset: const Offset(0, 8),
                 ),
@@ -860,7 +862,7 @@ class _WeeklyBarChartState extends State<WeeklyBarChart>
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withValues(alpha: (0.03)),
                 blurRadius: 18,
                 offset: const Offset(0, 8),
               ),
@@ -982,7 +984,7 @@ class _WeeklyBarChartState extends State<WeeklyBarChart>
                   borderRadius: BorderRadius.circular(18),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.02),
+                      color: Colors.black.withValues(alpha: (0.02)),
                       blurRadius: 10,
                       offset: const Offset(0, 4),
                     ),
@@ -1278,12 +1280,12 @@ class _DailyPieChartState extends State<DailyPieChart>
                         margin: const EdgeInsets.symmetric(vertical: 2),
                         decoration: BoxDecoration(
                           color: isSelected
-                              ? item['color'].withOpacity(0.08)
+                              ? item['color'].withValues(alpha: (0.08))
                               : Colors.transparent,
                           borderRadius: BorderRadius.circular(8),
                           border: isSelected
                               ? Border.all(
-                                  color: item['color'].withOpacity(0.3),
+                                  color: item['color'].withValues(alpha: (0.3)),
                                   width: 1)
                               : null,
                         ),
@@ -1385,7 +1387,7 @@ class _DailyPieChartState extends State<DailyPieChart>
                   borderRadius: BorderRadius.circular(14),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.015),
+                      color: Colors.black.withValues(alpha: (0.015)),
                       blurRadius: 8,
                       offset: const Offset(0, 4),
                     ),

@@ -12,19 +12,19 @@ class _VisionBoardScreenState extends State<VisionBoardScreen> {
     {
       'title': 'Minimal workspace',
       'subtitle': 'Organize with clean visuals and calm notes.',
-      'color': Color(0xFFEEF2FF),
+      'color': const Color(0xFFEEF2FF),
       'checklist': ['Morning routine', 'Weekly goals'],
     },
     {
       'title': 'Fitness goal',
       'subtitle': 'Reach 15k steps and strength targets.',
-      'color': Color(0xFFE8F7F0),
+      'color': const Color(0xFFE8F7F0),
       'checklist': ['Yoga', 'Walk', 'Hydrate'],
     },
     {
       'title': 'Creative idea',
       'subtitle': 'Design a soft product experience.',
-      'color': Color(0xFFFFF5E8),
+      'color': const Color(0xFFFFF5E8),
       'checklist': ['Mood board', 'Texture study'],
     },
   ];

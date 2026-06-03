@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:habit_tracker/Features/Widgets/custom_charts.dart';
+import 'package:habit_tracker/Features/Screens/profile_screen.dart';
 
 class DashboardView extends StatefulWidget {
   const DashboardView({super.key});
@@ -40,10 +43,10 @@ class _DashboardViewState extends State<DashboardView>
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Column(
+                  const Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Welcome back,',
                         style: TextStyle(
                           fontSize: 15,
@@ -51,44 +54,50 @@ class _DashboardViewState extends State<DashboardView>
                           color: Color(0xFF5F6E8A),
                         ),
                       ),
-                      const SizedBox(height: 3),
+                      SizedBox(height: 3),
                       Text(
                         'Your Productivity Hub',
                         style: TextStyle(
                           fontSize: 25,
                           fontWeight: FontWeight.w800,
-                          color: const Color(0xFF1E293B),
+                          color: Color(0xFF1E293B),
                           letterSpacing: -0.5,
                         ),
                       ),
                     ],
                   ),
                   // Glowing avatar placeholder
-                  Container(
-                    width: 44,
-                    height: 44,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [Color(0xFF7C77F2), Color(0xFF5C6BC0)],
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                      ),
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF7C77F2).withOpacity(0.3),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
+                  GestureDetector(
+                    onTap: () {
+                      Get.to(() => const ProfileScreen());
+                    },
+                    child: Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFF7C77F2), Color(0xFF5C6BC0)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
                         ),
-                      ],
-                    ),
-                    child: const Center(
-                      child: Text(
-                        'SR',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w800,
-                          fontSize: 14,
+                        shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: const Color(0xFF7C77F2)
+                                .withValues(alpha: (0.3)),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Text(
+                          'SR',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                     ),
@@ -99,7 +108,8 @@ class _DashboardViewState extends State<DashboardView>
 
             // Top Mini-Stats Cards
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
                 children: [
                   Expanded(
@@ -150,7 +160,7 @@ class _DashboardViewState extends State<DashboardView>
                   borderRadius: BorderRadius.circular(12.0),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.04),
+                      color: Colors.black.withValues(alpha: (0.04)),
                       blurRadius: 6,
                       offset: const Offset(0, 2),
                     ),
@@ -158,8 +168,10 @@ class _DashboardViewState extends State<DashboardView>
                 ),
                 labelColor: primaryColor,
                 unselectedLabelColor: const Color(0xFF7B8CB5),
-                labelStyle: const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
-                unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                labelStyle:
+                    const TextStyle(fontWeight: FontWeight.w800, fontSize: 13),
+                unselectedLabelStyle:
+                    const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                 tabs: const [
                   Tab(text: "Yearly"),
                   Tab(text: "Monthly"),
@@ -189,7 +201,8 @@ class _DashboardViewState extends State<DashboardView>
     );
   }
 
-  Widget _buildMiniStatCard(String label, String value, IconData icon, Color color) {
+  Widget _buildMiniStatCard(
+      String label, String value, IconData icon, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
       decoration: BoxDecoration(
@@ -197,7 +210,7 @@ class _DashboardViewState extends State<DashboardView>
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withValues(alpha: (0.02)),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),
@@ -208,7 +221,7 @@ class _DashboardViewState extends State<DashboardView>
           Container(
             padding: const EdgeInsets.all(6),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.12),
+              color: color.withValues(alpha: (0.12)),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, color: color, size: 18),

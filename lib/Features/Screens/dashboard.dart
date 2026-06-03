@@ -274,7 +274,7 @@ class DashboardOverviewScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: (0.04)),
             blurRadius: 18,
             offset: const Offset(0, 12),
           ),
@@ -320,7 +320,7 @@ class DashboardOverviewScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(22),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: (0.04)),
                 blurRadius: 18,
                 offset: const Offset(0, 12),
               ),
@@ -333,7 +333,7 @@ class DashboardOverviewScreen extends StatelessWidget {
                 width: 44,
                 height: 44,
                 decoration: BoxDecoration(
-                  color: const Color(0xFF7C77F2).withOpacity(0.16),
+                  color: const Color(0xFF7C77F2).withValues(alpha: (0.16)),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Icon(icon, color: const Color(0xFF7C77F2)),
@@ -365,7 +365,7 @@ class DashboardOverviewScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: (0.04)),
             blurRadius: 18,
             offset: const Offset(0, 12),
           ),
@@ -417,7 +417,7 @@ class DashboardOverviewScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(22),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: (0.04)),
             blurRadius: 18,
             offset: const Offset(0, 12),
           ),

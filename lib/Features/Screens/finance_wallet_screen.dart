@@ -49,9 +49,9 @@ class FinanceWalletScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Column(
+                    const Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
+                      children: [
                         Text(
                           'Balance',
                           style: TextStyle(color: Color(0xFF7B8CB5)),
@@ -82,7 +82,8 @@ class FinanceWalletScreen extends StatelessWidget {
                             height: 90,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: const Color(0xFF7C77F2).withOpacity(0.14),
+                              color: const Color(0xFF7C77F2)
+                                  .withValues(alpha: (0.14)),
                             ),
                           ),
                           const Text(
@@ -118,7 +119,7 @@ class FinanceWalletScreen extends StatelessWidget {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: color.withOpacity(0.18),
+                            color: color.withValues(alpha: (0.18)),
                             borderRadius: BorderRadius.circular(14),
                           ),
                           child: Icon(
@@ -191,7 +192,7 @@ class FinanceWalletScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.04),
+                          color: Colors.black.withValues(alpha: (0.04)),
                           blurRadius: 16,
                           offset: const Offset(0, 10),
                         )

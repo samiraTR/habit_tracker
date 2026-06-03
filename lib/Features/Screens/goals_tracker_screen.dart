@@ -58,7 +58,7 @@ class GoalsTrackerScreen extends StatelessWidget {
                         borderRadius: BorderRadius.circular(22),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(0.04),
+                            color: Colors.black.withValues(alpha: (0.04)),
                             blurRadius: 16,
                             offset: const Offset(0, 10),
                           ),
@@ -169,7 +169,7 @@ class GoalsTrackerScreen extends StatelessWidget {
                     height: 68,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: const Color(0xFF7C77F2).withOpacity(0.14),
+                      color: const Color(0xFF7C77F2).withValues(alpha: (0.14)),
                     ),
                   ),
                   const Text(
