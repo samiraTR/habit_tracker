@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:habit_tracker/Features/Screens/dashboard_screen.dart';
+import 'package:habit_tracker/Features/Screens/dashboard.dart';
+import 'package:habit_tracker/Features/Screens/report_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -40,7 +41,7 @@ class MyApp extends StatelessWidget {
           titleLarge: TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
-      home: const DashboardView(),
+      home: const ReportScreen(),
     );
   }
 }

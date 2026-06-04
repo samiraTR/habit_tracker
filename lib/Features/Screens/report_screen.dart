@@ -1,17 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/get_core/src/get_main.dart';
 import 'package:habit_tracker/Features/Widgets/custom_charts.dart';
 import 'package:habit_tracker/Features/Screens/profile_screen.dart';
 
-class DashboardView extends StatefulWidget {
-  const DashboardView({super.key});
+class ReportScreen extends StatefulWidget {
+  const ReportScreen({super.key});
 
   @override
-  State<DashboardView> createState() => _DashboardViewState();
+  State<ReportScreen> createState() => _ReportScreenState();
 }
 
-class _DashboardViewState extends State<DashboardView>
+class _ReportScreenState extends State<ReportScreen>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
 
@@ -69,7 +68,7 @@ class _DashboardViewState extends State<DashboardView>
                   // Glowing avatar placeholder
                   GestureDetector(
                     onTap: () {
-                      Get.to(() => const ProfileScreen());
+                      Get.to(ProfileScreen());
                     },
                     child: Container(
                       width: 44,

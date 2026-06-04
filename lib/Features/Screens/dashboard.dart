@@ -5,6 +5,7 @@ import 'package:habit_tracker/Features/Screens/goals_tracker_screen.dart';
 import 'package:habit_tracker/Features/Screens/journal_screen.dart';
 import 'package:habit_tracker/Features/Screens/routine_screen.dart';
 import 'package:habit_tracker/Features/Screens/vision_board_screen.dart';
+import 'package:habit_tracker/Features/Widgets/notice_slide_show.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -104,18 +105,15 @@ class _DashboardScreenState extends State<DashboardScreen> {
         notchMargin: 8,
         elevation: 14,
         color: Colors.white,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              _buildNavItem(Icons.home_rounded, 'Overview', 0),
-              _buildNavItem(Icons.view_day_rounded, 'Planner', 1),
-              const SizedBox(width: 56),
-              _buildNavItem(Icons.flag_rounded, 'Goals', 2),
-              _buildNavItem(Icons.account_balance_wallet_rounded, 'Wallet', 3),
-            ],
-          ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            _buildNavItem(Icons.home_rounded, 'Overview', 0),
+            _buildNavItem(Icons.view_day_rounded, 'Planner', 1),
+            const SizedBox(width: 56),
+            _buildNavItem(Icons.flag_rounded, 'Goals', 2),
+            _buildNavItem(Icons.account_balance_wallet_rounded, 'Wallet', 3),
+          ],
         ),
       ),
     );
@@ -128,13 +126,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
       onTap: () => setState(() => _selectedIndex = index),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
         decoration: BoxDecoration(
           color: isActive ? const Color(0xFFEEF2FF) : Colors.transparent,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          // mainAxisSize: MainAxisSize.min,
           children: [
             Icon(icon, color: color, size: 22),
             const SizedBox(height: 4),
@@ -164,26 +162,26 @@ class DashboardOverviewScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Welcome back,',
-              style: TextStyle(fontSize: 16, color: Color(0xFF5F6E8A)),
-            ),
-            const SizedBox(height: 4),
-            const Text(
-              'Your productivity hub',
-              style: TextStyle(
-                  fontSize: 32, fontWeight: FontWeight.w800, height: 1.1),
-            ),
+            // const Text(
+            //   'Welcome back,',
+            //   style: TextStyle(fontSize: 16, color: Color(0xFF5F6E8A)),
+            // ),
+            // const SizedBox(height: 4),
+            // const Text(
+            //   'Your productivity hub',
+            //   style: TextStyle(
+            //       fontSize: 22, fontWeight: FontWeight.w800, height: 1.1),
+            // ),
             const SizedBox(height: 18),
-            Row(
-              children: [
-                _buildBadge('Daily', true),
-                const SizedBox(width: 10),
-                _buildBadge('Monthly'),
-                const SizedBox(width: 10),
-                _buildBadge('Yearly'),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     _buildBadge('Daily', true),
+            //     const SizedBox(width: 10),
+            //     _buildBadge('Monthly'),
+            //     const SizedBox(width: 10),
+            //     _buildBadge('Yearly'),
+            //   ],
+            // ),
             const SizedBox(height: 22),
             Row(
               children: [
@@ -203,31 +201,50 @@ class DashboardOverviewScreen extends StatelessWidget {
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
             ),
             const SizedBox(height: 12),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                _buildQuickCard(context, 'Routine', Icons.checklist_rtl_rounded,
-                    const RoutineScreen()),
-                _buildQuickCard(context, 'Journal', Icons.edit_note_rounded,
-                    const JournalScreen()),
-                _buildQuickCard(context, 'Vision', Icons.photo_library_rounded,
-                    const VisionBoardScreen()),
-              ],
+            GridView.builder(
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3, // number of items in each row
+                mainAxisSpacing: 8.0, // spacing between rows
+                crossAxisSpacing: 8.0, // spacing between columns
+              ),
+              itemCount: 5,
+              shrinkWrap: true,
+              itemBuilder: (context, index) {
+                return _buildQuickCard(context, 'Vision',
+                    Icons.photo_library_rounded, const VisionBoardScreen());
+              },
             ),
+
+            // Row(
+            //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            //   children: [
+            //     _buildQuickCard(context, 'Routine', Icons.checklist_rtl_rounded,
+            //         const RoutineScreen()),
+            //     _buildQuickCard(context, 'Journal', Icons.edit_note_rounded,
+            //         const JournalScreen()),
+            //     _buildQuickCard(context, 'Vision', Icons.photo_library_rounded,
+            //         const VisionBoardScreen()),
+            //     _buildQuickCard(context, 'Vision', Icons.photo_library_rounded,
+            //         const VisionBoardScreen()),
+            //     _buildQuickCard(context, 'Vision', Icons.photo_library_rounded,
+            //         const VisionBoardScreen()),
+            //   ],
+            // ),
             const SizedBox(height: 22),
             const _SectionHeader(title: 'Today’s focus'),
             const SizedBox(height: 12),
-            _buildTaskPreview(
-              '3:00 PM',
-              'Design review',
-              'Set a calm pace for your afternoon sprint.',
-            ),
-            const SizedBox(height: 12),
-            _buildTaskPreview(
-              '4:30 PM',
-              'Goals refresh',
-              'Update milestones and note progress.',
-            ),
+            NoticeSlideshow(),
+            // _buildTaskPreview(
+            //   '3:00 PM',
+            //   'Design review',
+            //   'Set a calm pace for your afternoon sprint.',
+            // ),
+            // const SizedBox(height: 12),
+            // _buildTaskPreview(
+            //   '4:30 PM',
+            //   'Goals refresh',
+            //   'Update milestones and note progress.',
+            // ),
             const SizedBox(height: 22),
             const _SectionHeader(title: 'Progress overview'),
             const SizedBox(height: 12),
@@ -304,54 +321,51 @@ class DashboardOverviewScreen extends StatelessWidget {
 
   Widget _buildQuickCard(
       BuildContext context, String title, IconData icon, Widget screen) {
-    return Expanded(
-      child: InkWell(
-        onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => screen),
+    return InkWell(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => screen),
+      ),
+      borderRadius: BorderRadius.circular(22),
+      child: Container(
+        height: 142,
+        margin: const EdgeInsets.only(right: 8),
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: (0.04)),
+              blurRadius: 18,
+              offset: const Offset(0, 12),
+            ),
+          ],
         ),
-        borderRadius: BorderRadius.circular(22),
-        child: Container(
-          height: 142,
-          margin: const EdgeInsets.only(right: 8),
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(22),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: (0.04)),
-                blurRadius: 18,
-                offset: const Offset(0, 12),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 44,
-                height: 44,
-                decoration: BoxDecoration(
-                  color: const Color(0xFF7C77F2).withValues(alpha: (0.16)),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: Icon(icon, color: const Color(0xFF7C77F2)),
-              ),
-              const SizedBox(height: 18),
-              Text(
-                title,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Open the module for quick actions.',
-                style: TextStyle(
-                    color: Color(0xFF7B8CB5), fontSize: 12, height: 1.5),
-              ),
-            ],
-          ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Container(
+            //   width: 44,
+            //   height: 44,
+            //   decoration: BoxDecoration(
+            //     color: const Color(0xFF7C77F2).withValues(alpha: (0.16)),
+            //     borderRadius: BorderRadius.circular(14),
+            //   ),
+            //   child: Icon(icon, color: const Color(0xFF7C77F2)),
+            // ),
+            // const SizedBox(height: 18),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+            ),
+            // const SizedBox(height: 8),
+            // const Text(
+            //   'Open the module for quick actions.',
+            //   style: TextStyle(
+            //       color: Color(0xFF7B8CB5), fontSize: 12, height: 1.5),
+            // ),
+          ],
         ),
       ),
     );
