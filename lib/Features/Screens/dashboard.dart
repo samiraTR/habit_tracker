@@ -2,10 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:habit_tracker/Features/Screens/day_planner_screen.dart';
 import 'package:habit_tracker/Features/Screens/finance_wallet_screen.dart';
 import 'package:habit_tracker/Features/Screens/goals_tracker_screen.dart';
-import 'package:habit_tracker/Features/Screens/journal_screen.dart';
-import 'package:habit_tracker/Features/Screens/routine_screen.dart';
-import 'package:habit_tracker/Features/Screens/vision_board_screen.dart';
 import 'package:habit_tracker/Features/Widgets/notice_slide_show.dart';
+import 'package:intl/intl.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({Key? key}) : super(key: key);
@@ -162,58 +160,119 @@ class DashboardOverviewScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // const Text(
-            //   'Welcome back,',
-            //   style: TextStyle(fontSize: 16, color: Color(0xFF5F6E8A)),
-            // ),
-            // const SizedBox(height: 4),
-            // const Text(
-            //   'Your productivity hub',
-            //   style: TextStyle(
-            //       fontSize: 22, fontWeight: FontWeight.w800, height: 1.1),
-            // ),
+            const Text(
+              'Welcome back,',
+              style: TextStyle(fontSize: 16, color: Color(0xFF5F6E8A)),
+            ),
+            Text(DateFormat.yMMMMEEEEd().format(DateTime.now()),
+                style: const TextStyle(fontSize: 14, color: Color(0xFF5F6E8A))),
+            const SizedBox(height: 4),
+            const Text(
+              'Your productivity hub',
+              style: TextStyle(
+                  fontSize: 22, fontWeight: FontWeight.w800, height: 1.1),
+            ),
             const SizedBox(height: 18),
+            Row(children: [
+              Expanded(
+                  child: _buildSummaryCard(
+                "Tasks",
+                "target",
+                "4/5",
+                "",
+              )),
+              const SizedBox(width: 14),
+              Expanded(
+                  child: _buildSummaryCard("Streak", "fire", "2 days", "")),
+              const SizedBox(width: 14),
+              Expanded(
+                  child: _buildSummaryCard("Mood", "smiling-face", "Good", "")),
+            ]),
+            _buildTitleWidget('Today\'s schedule', () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DayPlannerScreen()),
+              );
+            }),
+
+            Container(
+              width: double.infinity,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: (0.04)),
+                    blurRadius: 18,
+                    offset: const Offset(0, 12),
+                  ),
+                ],
+              ),
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 18.0),
+                child: Row(
+                  // crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      flex: 0,
+                      child: Text(
+                        '9:00 AM',
+                        style: TextStyle(
+                            fontSize: 14.3, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    SizedBox(width: 16),
+                    Expanded(
+                      flex: 2,
+                      child: Text(
+                        'Morning routine',
+                        style: TextStyle(
+                            fontSize: 14.6, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+            _buildTitleWidget('Routines', () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const DayPlannerScreen()),
+              );
+            }),
+            const SizedBox(height: 22),
             // Row(
             //   children: [
-            //     _buildBadge('Daily', true),
-            //     const SizedBox(width: 10),
-            //     _buildBadge('Monthly'),
-            //     const SizedBox(width: 10),
-            //     _buildBadge('Yearly'),
+            //     Expanded(
+            //         child: _buildSummaryCard(
+            //             'Today plan', '5 items', 'Soft focus')),
+            //     const SizedBox(width: 14),
+            //     Expanded(
+            //         child: _buildSummaryCard(
+            //             'Routines', '3 habits', '84% complete',
+            //             soft: true)),
             //   ],
             // ),
-            const SizedBox(height: 22),
-            Row(
-              children: [
-                Expanded(
-                    child: _buildSummaryCard(
-                        'Today plan', '5 items', 'Soft focus')),
-                const SizedBox(width: 14),
-                Expanded(
-                    child: _buildSummaryCard(
-                        'Routines', '3 habits', '84% complete',
-                        soft: true)),
-              ],
-            ),
             const SizedBox(height: 20),
-            const Text(
-              'Quick actions',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
-            ),
-            const SizedBox(height: 12),
-            GridView.builder(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3, // number of items in each row
-                mainAxisSpacing: 8.0, // spacing between rows
-                crossAxisSpacing: 8.0, // spacing between columns
-              ),
-              itemCount: 5,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return _buildQuickCard(context, 'Vision',
-                    Icons.photo_library_rounded, const VisionBoardScreen());
-              },
-            ),
+            // const Text(
+            //   'Quick actions',
+            //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+            // ),
+            // const SizedBox(height: 12),
+            // GridView.builder(
+            //   gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            //     crossAxisCount: 3, // number of items in each row
+            //     mainAxisSpacing: 8.0, // spacing between rows
+            //     crossAxisSpacing: 8.0, // spacing between columns
+            //   ),
+            //   itemCount: 5,
+            //   shrinkWrap: true,
+            //   itemBuilder: (context, index) {
+            //     return _buildQuickCard(context, 'Vision',
+            //         Icons.photo_library_rounded, const VisionBoardScreen());
+            //   },
+            // ),
 
             // Row(
             //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -231,7 +290,7 @@ class DashboardOverviewScreen extends StatelessWidget {
             //   ],
             // ),
             const SizedBox(height: 22),
-            const _SectionHeader(title: 'Today’s focus'),
+            const _SectionHeader(title: 'Today\'s focus'),
             const SizedBox(height: 12),
             NoticeSlideshow(),
             // _buildTaskPreview(
@@ -265,6 +324,20 @@ class DashboardOverviewScreen extends StatelessWidget {
     );
   }
 
+  Row _buildTitleWidget(String title, Function()? onViewAll) {
+    return Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
+      Text(
+        title,
+        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700),
+      ),
+      const SizedBox(width: 14),
+      TextButton(
+        onPressed: onViewAll,
+        child: const Text('View All'),
+      ),
+    ]);
+  }
+
   Widget _buildBadge(String label, [bool active = false]) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -282,10 +355,11 @@ class DashboardOverviewScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSummaryCard(String title, String amount, String caption,
+  Widget _buildSummaryCard(
+      String title, String iconName, String amount, String caption,
       {bool soft = false}) {
     return Container(
-      padding: const EdgeInsets.all(18),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: soft ? const Color(0xFFF5F7FF) : Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -300,20 +374,30 @@ class DashboardOverviewScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: const TextStyle(color: Color(0xFF7B8CB5)),
+          Row(
+            children: [
+              Text(
+                title,
+                style: const TextStyle(color: Color(0xFF7B8CB5)),
+              ),
+              const SizedBox(width: 6),
+              Image.asset(
+                'assets/images/$iconName.png',
+                width: 16,
+                height: 16,
+              ),
+            ],
           ),
-          const SizedBox(height: 10),
+          // const SizedBox(height: 10),
           Text(
             amount,
-            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w800),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w800),
           ),
-          const SizedBox(height: 10),
-          Text(
-            caption,
-            style: const TextStyle(color: Color(0xFF5F6E8A)),
-          ),
+          // const SizedBox(height: 10),
+          // Text(
+          //   caption,
+          //   style: const TextStyle(color: Color(0xFF5F6E8A)),
+          // ),
         ],
       ),
     );

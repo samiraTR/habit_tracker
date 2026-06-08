@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
           titleLarge: TextStyle(fontWeight: FontWeight.w700),
         ),
       ),
-      home: const ReportScreen(),
+      home: const DashboardScreen(),
     );
   }
 }
