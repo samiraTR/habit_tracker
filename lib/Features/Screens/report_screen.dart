@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/Features/Widgets/custom_charts.dart';
-import 'package:habit_tracker/Features/Screens/profile_screen.dart';
+import 'package:habit_tracker/Features/profile/profile_screen.dart';
 
 class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key});

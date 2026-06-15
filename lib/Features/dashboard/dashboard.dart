@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/Features/Screens/day_planner_screen.dart';
-import 'package:habit_tracker/Features/Screens/finance_wallet_screen.dart';
-import 'package:habit_tracker/Features/Screens/goals_tracker_screen.dart';
-import 'package:habit_tracker/Features/Widgets/notice_slide_show.dart';
+import 'package:get/get.dart';
+import 'package:habit_tracker/Core/routes/app_routes.dart';
+import 'package:habit_tracker/Features/day_planner/day_planner_screen.dart';
+import 'package:habit_tracker/Features/finance/finance_wallet_screen.dart';
+import 'package:habit_tracker/Features/goal_tracker/goals_tracker_screen.dart';
+import 'package:habit_tracker/Features/others/widgets/notice_slide_show.dart';
+import 'package:habit_tracker/Features/routine/routine_screen.dart';
 import 'package:intl/intl.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -160,17 +163,69 @@ class DashboardOverviewScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Welcome back,',
-              style: TextStyle(fontSize: 16, color: Color(0xFF5F6E8A)),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Welcome back,',
+                        style:
+                            TextStyle(fontSize: 16, color: Color(0xFF5F6E8A)),
+                      ),
+                      Text(
+                        DateFormat.yMMMMEEEEd().format(DateTime.now()),
+                        style: const TextStyle(
+                            fontSize: 14, color: Color(0xFF5F6E8A)),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 12),
+                InkWell(
+                  onTap: () {
+                    Get.toNamed(AppRoutes.financeWallet);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF7C77F2).withValues(alpha: 0.16),
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min, // ← keeps the pill tight
+                      children: [
+                        CircleAvatar(
+                          radius: 13,
+                          backgroundColor:
+                              const Color(0xFF7C77F2).withValues(alpha: 0.16),
+                          child: const Icon(
+                              Icons.account_balance_wallet_rounded,
+                              size: 18,
+                              color: Color(0xFF7C77F2)),
+                        ),
+                        const SizedBox(width: 8),
+                        const Text(
+                          "20000000",
+                          style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFF7C77F2),
+                              fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-            Text(DateFormat.yMMMMEEEEd().format(DateTime.now()),
-                style: const TextStyle(fontSize: 14, color: Color(0xFF5F6E8A))),
-            const SizedBox(height: 4),
             const Text(
               'Your productivity hub',
               style: TextStyle(
-                  fontSize: 22, fontWeight: FontWeight.w800, height: 1.1),
+                  fontSize: 18, fontWeight: FontWeight.w800, height: 1.1),
             ),
             const SizedBox(height: 18),
             Row(children: [
@@ -238,7 +293,7 @@ class DashboardOverviewScreen extends StatelessWidget {
             _buildTitleWidget('Routines', () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const DayPlannerScreen()),
+                MaterialPageRoute(builder: (_) => const RoutineScreen()),
               );
             }),
             const SizedBox(height: 22),
