@@ -34,7 +34,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: Colors.white,
       builder: (context) {
         return Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -53,11 +53,18 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 spacing: 12,
                 runSpacing: 12,
                 children: [
-                  _buildQuickAction('Task', Icons.schedule_rounded),
-                  _buildQuickAction('Routine', Icons.checklist_rtl_rounded),
-                  _buildQuickAction('Goal', Icons.flag_rounded),
-                  _buildQuickAction('Journal', Icons.edit_rounded),
-                  _buildQuickAction('Vision', Icons.image_rounded),
+                  _buildQuickAction('Task', Icons.schedule_rounded,
+                      () => Get.toNamed(AppRoutes.financeWallet)),
+                  _buildQuickAction('Routine', Icons.checklist_rtl_rounded,
+                      () => Get.toNamed(AppRoutes.financeWallet)),
+                  _buildQuickAction('Goal', Icons.flag_rounded,
+                      () => Get.toNamed(AppRoutes.financeWallet)),
+                  _buildQuickAction('Journal', Icons.edit_rounded,
+                      () => Get.toNamed(AppRoutes.financeWallet)),
+                  _buildQuickAction('Vision', Icons.image_rounded,
+                      () => Get.toNamed(AppRoutes.financeWallet)),
+                  _buildQuickAction('Finance', Icons.credit_card_outlined,
+                      () => Get.toNamed(AppRoutes.walletEntry)),
                 ],
               ),
               const SizedBox(height: 18),
@@ -68,25 +75,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget _buildQuickAction(String label, IconData icon) {
-    return Container(
-      width: 120,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F7FF),
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: const Color(0xFF7C77F2), size: 24),
-          const SizedBox(height: 12),
-          Text(
-            label,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.w700),
-          ),
-        ],
+  Widget _buildQuickAction(String label, IconData icon, Function() onTap) {
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        width: 120,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        decoration: BoxDecoration(
+          color: const Color(0xFFF5F7FF),
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, color: const Color(0xFF7C77F2), size: 24),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: const TextStyle(fontWeight: FontWeight.w700),
+            ),
+          ],
+        ),
       ),
     );
   }
