@@ -1,21 +1,24 @@
-// const _expenseCategories = [
-//   _CategoryOption('Food', Palette.clay, Icons.local_cafe_rounded),
-//   _CategoryOption(
-//       'Transport', Palette.slate, Icons.directions_bus_filled_rounded),
-//   _CategoryOption('Wellness', Palette.sage, Icons.spa_rounded),
-//   _CategoryOption('Shopping', Palette.gold, Icons.shopping_bag_rounded),
-//   _CategoryOption('Misc', Palette.muted, Icons.receipt_long_rounded),
-// ];
-
-// const _incomeCategories = [
-//   _CategoryOption('Salary', Palette.teal, Icons.account_balance_wallet_rounded),
-//   _CategoryOption('Freelance', Palette.slate, Icons.work_outline_rounded),
-//   _CategoryOption('Gift', Palette.clay, Icons.card_giftcard_rounded),
-//   _CategoryOption('Other', Palette.muted, Icons.savings_rounded),
-// ];
-
 import 'package:flutter/material.dart';
 import 'package:habit_tracker/Core/themes/app_themes.dart';
+import 'package:habit_tracker/Features/finance/finance_model.dart';
+
+const currencySymbol = "৳";
+
+const expenseCategories = [
+  CategoryOption('Food', Palette.clay, Icons.local_cafe_rounded),
+  CategoryOption(
+      'Transport', Palette.slate, Icons.directions_bus_filled_rounded),
+  CategoryOption('Wellness', Palette.sage, Icons.spa_rounded),
+  CategoryOption('Shopping', Palette.gold, Icons.shopping_bag_rounded),
+  CategoryOption('Misc', Palette.muted, Icons.receipt_long_rounded),
+];
+
+const incomeCategories = [
+  CategoryOption('Salary', Palette.teal, Icons.account_balance_wallet_rounded),
+  CategoryOption('Freelance', Palette.slate, Icons.work_outline_rounded),
+  CategoryOption('Gift', Palette.clay, Icons.card_giftcard_rounded),
+  CategoryOption('Other', Palette.muted, Icons.savings_rounded),
+];
 
 InputDecoration decoration(
   Color isAccent, {

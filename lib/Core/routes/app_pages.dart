@@ -8,6 +8,6 @@ class AppPages {
   static final routes = [
     GetPage(name: AppRoutes.dashboard, page: () => const DashboardScreen()),
     GetPage(name: AppRoutes.financeWallet, page: () => FinanceWalletScreen()),
-    GetPage(name: AppRoutes.walletEntry, page: () => const WalletEntryScreen())
+    GetPage(name: AppRoutes.walletEntry, page: () =>  WalletEntryScreen())
   ];
 }

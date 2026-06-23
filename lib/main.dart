@@ -2,8 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/Core/routes/app_pages.dart';
 import 'package:habit_tracker/Core/routes/app_routes.dart';
+import 'package:hive_flutter/adapters.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+  // await HiveAdapters().hiveAdapterBox();
   runApp(const MyApp());
 }
 

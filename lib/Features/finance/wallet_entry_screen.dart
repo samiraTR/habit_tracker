@@ -2,354 +2,320 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:habit_tracker/Core/constants/constants.dart';
-import 'package:habit_tracker/Core/routes/app_routes.dart';
-import 'package:habit_tracker/Core/themes/app_themes.dart';
+import 'package:habit_tracker/Features/finance/controllers/wallet_entry_controller.dart';
+import 'package:habit_tracker/Features/finance/models/wallet_model.dart';
 
-class _CategoryOption {
-  const _CategoryOption(this.label, this.color, this.icon);
-  final String label;
-  final Color color;
-  final IconData icon;
-}
+import 'wallet_constants.dart';
 
-const _expenseCategories = [
-  _CategoryOption('Food', Palette.clay, Icons.local_cafe_rounded),
-  _CategoryOption(
-      'Transport', Palette.slate, Icons.directions_bus_filled_rounded),
-  _CategoryOption('Wellness', Palette.sage, Icons.spa_rounded),
-  _CategoryOption('Shopping', Palette.gold, Icons.shopping_bag_rounded),
-  _CategoryOption('Misc', Palette.muted, Icons.receipt_long_rounded),
-];
+class WalletEntryScreen extends StatelessWidget {
+  WalletEntryScreen({super.key});
+  bool isNote = false;
 
-const _incomeCategories = [
-  _CategoryOption('Salary', Palette.teal, Icons.account_balance_wallet_rounded),
-  _CategoryOption('Freelance', Palette.slate, Icons.work_outline_rounded),
-  _CategoryOption('Gift', Palette.clay, Icons.card_giftcard_rounded),
-  _CategoryOption('Other', Palette.muted, Icons.savings_rounded),
-];
-
-class WalletEntryScreen extends StatefulWidget {
-  const WalletEntryScreen({super.key});
-
-  @override
-  State<WalletEntryScreen> createState() => _WalletEntryScreenState();
-}
-
-class _WalletEntryScreenState extends State<WalletEntryScreen> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _amountController = TextEditingController();
-  final TextEditingController _titleController = TextEditingController();
-  final TextEditingController _noteController = TextEditingController();
 
-  bool _isExpense = true;
-  String _category = _expenseCategories.first.label;
-  DateTime _selectedDate = DateTime.now();
+  // Scoped to this route — disposed automatically when the screen is popped.
+  final WalletEntryController ctrl = Get.put(WalletEntryController());
 
-  List<_CategoryOption> get _categories =>
-      _isExpense ? _expenseCategories : _incomeCategories;
+  // ── Date / time picker ────────────────────────────────────
 
-  Color get _accent => _isExpense ? Palette.clay : Palette.teal;
-
-  @override
-  void dispose() {
-    _amountController.dispose();
-    _titleController.dispose();
-    _noteController.dispose();
-    super.dispose();
-  }
-
-  void _setEntryType(bool expense) {
-    if (_isExpense == expense) return;
-    setState(() {
-      _isExpense = expense;
-      // The category list changes with the type, so make sure whatever
-      // was selected before still exists in the new list.
-      if (!_categories.any((c) => c.label == _category)) {
-        _category = _categories.first.label;
-      }
-    });
-  }
-
-  bool _isToday(DateTime date) {
-    final now = DateTime.now();
-    return date.year == now.year &&
-        date.month == now.month &&
-        date.day == now.day;
-  }
-
-  String _formatDate(DateTime date) {
-    const weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    const months = [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec',
-    ];
-    final label =
-        '${weekdays[date.weekday - 1]}, ${date.day} ${months[date.month - 1]} ${date.year}';
-    return _isToday(date) ? 'Today · $label' : label;
-  }
-
-  Future<void> _pickDate() async {
-    final picked = await showDatePicker(
+  Future<void> _pickDateTime(BuildContext context) async {
+    final pickedDate = await showDatePicker(
       context: context,
-      initialDate: _selectedDate,
+      initialDate: ctrl.selectedDate.value,
       firstDate: DateTime(2000),
       lastDate: DateTime(2100),
     );
-    if (picked != null && picked != _selectedDate) {
-      setState(() => _selectedDate = picked);
-    }
-  }
+    if (pickedDate == null) return;
+    if (!context.mounted) return;
 
-  void _saveEntry() {
-    if (_formKey.currentState?.validate() ?? false) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-            content: Text('${_isExpense ? 'Expense' : 'Income'} entry saved')),
-      );
-      Get.toNamed(AppRoutes.financeWallet);
-    }
-  }
+    final pickedTime = await showTimePicker(
+      context: context,
+      initialTime: ctrl.selectedTime.value,
+    );
+    if (pickedTime == null) return;
 
-  // InputDecoration decoration({String? hint, String? prefixText}) {
-  //   OutlineInputBorder border(Color color, [double width = 1]) =>
-  //       OutlineInputBorder(
-  //         borderRadius: BorderRadius.circular(14),
-  //         borderSide: BorderSide(color: color, width: width),
-  //       );
-  //   return InputDecoration(
-  //     hintText: hint,
-  //     prefixText: prefixText,
-  //     prefixStyle:
-  //         const TextStyle(fontWeight: FontWeight.w700, color: Palette.ink),
-  //     filled: true,
-  //     fillColor: Palette.surface,
-  //     border: border(Palette.hairline),
-  //     enabledBorder: border(Palette.hairline),
-  //     focusedBorder: border(_accent, 1.6),
-  //     errorBorder: border(Colors.redAccent.shade100),
-  //     focusedErrorBorder: border(Colors.redAccent, 1.6),
-  //   );
-  // }
+    ctrl.setDate(pickedDate);
+    ctrl.setTime(pickedTime);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final selectedCategory =
-        _categories.firstWhere((c) => c.label == _category);
-
     return Scaffold(
-      backgroundColor: Palette.bg,
+      backgroundColor: WalletPalette.bg,
       appBar: AppBar(
-        backgroundColor: Palette.bg,
+        backgroundColor: WalletPalette.bg,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: Palette.ink),
-          onPressed: () => Navigator.of(context).pop(),
+          icon: const Icon(Icons.close_rounded, color: WalletPalette.ink),
+          onPressed: () => Get.back(),
         ),
         title: const Text(
           'New entry',
-          style: TextStyle(fontWeight: FontWeight.w800, color: Palette.ink),
+          style:
+              TextStyle(fontWeight: FontWeight.w800, color: WalletPalette.ink),
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(18, 4, 18, 28),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Type comes first: it decides the amount's sign and which
-                // categories make sense, so everything below reacts to it.
-                _TypeToggle(isExpense: _isExpense, onChanged: _setEntryType),
-                const SizedBox(height: 16),
-                _LivePreview(
-                  isExpense: _isExpense,
-                  accent: _accent,
-                  category: selectedCategory,
-                  amountListenable: _amountController,
-                  titleListenable: _titleController,
-                  dateLabel: _formatDate(_selectedDate),
-                ),
-                const SizedBox(height: 26),
-                const _FieldLabel('Amount'),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _amountController,
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  inputFormatters: [
-                    FilteringTextInputFormatter.allow(
-                        RegExp(r'^\d*\.?\d{0,2}')),
-                  ],
-                  style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w700,
-                      color: Palette.ink),
-                  decoration:
-                      decoration(_accent, hint: '0.00', prefixText: '\$ '),
-                  validator: (value) {
-                    final cleaned = value?.replaceAll(',', '').trim() ?? '';
-                    if (cleaned.isEmpty) return 'Enter an amount';
-                    final parsed = double.tryParse(cleaned);
-                    if (parsed == null) return 'Enter a valid number';
-                    if (parsed <= 0) return 'Amount must be greater than zero';
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 18),
-                const _FieldLabel('Title'),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _titleController,
-                  decoration:
-                      decoration(_accent, hint: 'e.g. Coffee with a client'),
-                  validator: (value) {
-                    if (value == null || value.trim().isEmpty) {
-                      return 'Enter a title';
-                    }
-                    return null;
-                  },
-                ),
-                const SizedBox(height: 18),
-                const _FieldLabel('Category'),
-                const SizedBox(height: 8),
-                DropdownButtonFormField<String>(
-                  value: _category,
-                  decoration: decoration(_accent),
-                  items: _categories.map((c) {
-                    return DropdownMenuItem(
-                      value: c.label,
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            width: 22,
-                            height: 22,
-                            decoration: BoxDecoration(
-                              color: c.color.withValues(alpha: 0.16),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(c.icon, size: 12, color: c.color),
-                          ),
-                          const SizedBox(width: 10),
-                          Text(c.label),
-                        ],
+        child: Obx(() {
+          final accent = ctrl.accent;
+          // final categories = ctrl.categories;
+          final selectedCat = ctrl.selectedCategory;
+          final dateStr = fullDateLabel(ctrl.combinedDateTime);
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Type toggle ─────────────────────────────
+                  _TypeToggle(
+                      isExpense: ctrl.isExpense.value, onChanged: ctrl.setType),
+                  const SizedBox(height: 16),
+
+                  // ── Live preview ────────────────────────────
+                  _LivePreview(
+                    isExpense: ctrl.isExpense.value,
+                    accent: accent,
+                    category: selectedCat,
+                    amountCtrl: ctrl.amountCtrl,
+                    titleCtrl: ctrl.titleCtrl,
+                    dateLabel: dateStr,
+                  ),
+                  const SizedBox(height: 26),
+
+                  Row(
+                    children: [
+                      // ── Title ───────────────────────────────────
+                      Expanded(
+                        flex: 2,
+                        child: buildEntryForm('Title', accent, context),
                       ),
-                    );
-                  }).toList(),
-                  onChanged: (value) {
-                    if (value != null) setState(() => _category = value);
-                  },
-                ),
-                const SizedBox(height: 18),
-                const _FieldLabel('Date'),
-                const SizedBox(height: 8),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Expanded(
-                      child: InkWell(
-                        onTap: _pickDate,
-                        borderRadius: BorderRadius.circular(14),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 16),
-                          decoration: BoxDecoration(
-                            color: Palette.surface,
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(color: Palette.hairline),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                _formatDate(_selectedDate),
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: Palette.ink),
-                              ),
-                              Icon(Icons.calendar_month_rounded,
-                                  color: _accent, size: 20),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (!_isToday(_selectedDate)) ...[
+
                       const SizedBox(width: 10),
-                      SizedBox(
-                        height: 52,
-                        child: TextButton(
-                          style: TextButton.styleFrom(
-                            backgroundColor: Palette.surface,
-                            foregroundColor: _accent,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                              side: const BorderSide(color: Palette.hairline),
-                            ),
-                          ),
-                          onPressed: () =>
-                              setState(() => _selectedDate = DateTime.now()),
-                          child: const Text('Today',
-                              style: TextStyle(fontWeight: FontWeight.w700)),
-                        ),
+                      // ── Amount ──────────────────────────────────
+
+                      Expanded(
+                        flex: 1,
+                        child: buildEntryForm('Amount', accent, context),
                       ),
                     ],
-                  ],
-                ),
-                const SizedBox(height: 18),
-                const _FieldLabel('Note (optional)'),
-                const SizedBox(height: 8),
-                TextFormField(
-                  controller: _noteController,
-                  maxLines: 3,
-                  maxLength: 140,
-                  decoration:
-                      decoration(_accent, hint: 'Add any extra detail...'),
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: _saveEntry,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: _accent,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16)),
-                    ),
-                    child: Text(
-                      _isExpense ? 'Save expense' : 'Save income',
-                      style: const TextStyle(
-                          fontSize: 16, fontWeight: FontWeight.w700),
+                  ),
+
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                          child: buildEntryForm('Category', accent, context)),
+                      const SizedBox(width: 10),
+                      Expanded(
+                          child:
+                              buildEntryForm("Date & time", accent, context)),
+                    ],
+                  ),
+
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: ctrl.addNote,
+                      child: const Text("Add Note"),
                     ),
                   ),
-                ),
-              ],
+
+                  // ── Note ────────────────────────────────────
+                  ctrl.isNote.value
+                      ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const _FieldLabel('Note (optional)'),
+                            const SizedBox(height: 8),
+                            TextFormField(
+                              controller: ctrl.noteCtrl,
+                              maxLines: 3,
+                              maxLength: 140,
+                              decoration: decoration(accent,
+                                  hint: 'Add any extra detail...'),
+                            ),
+                          ],
+                        )
+                      : const SizedBox.shrink(),
+                  const SizedBox(height: 12),
+
+                  // ── Save button ─────────────────────────────
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () => ctrl.save(_formKey),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: accent,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Text(
+                        ctrl.isExpense.value ? 'Save expense' : 'Save income',
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }
+
+  Column buildEntryForm(String title, Color accent, BuildContext buildContext) {
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      _FieldLabel(title),
+      const SizedBox(height: 8),
+      titleWidget(title, accent, buildContext),
+    ]);
+  }
+
+  Widget titleWidget(String title, Color accent, BuildContext context) {
+    switch (title) {
+      case 'Category':
+        return DropdownButtonFormField<String>(
+          value: ctrl.category.value,
+          decoration: decoration(accent),
+          items: ctrl.categories.map((c) {
+            return DropdownMenuItem(
+              value: c.label,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Container(
+                    width: 22,
+                    height: 22,
+                    decoration: BoxDecoration(
+                      color: c.color.withValues(alpha: 0.16),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(c.icon, size: 12, color: c.color),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(c.label),
+                ],
+              ),
+            );
+          }).toList(),
+          onChanged: (v) {
+            if (v != null) ctrl.setCategory(v);
+          },
+        );
+
+      case 'Date & time':
+        return Row(
+          children: [
+            Expanded(
+              child: InkWell(
+                onTap: () => _pickDateTime(context),
+                borderRadius: BorderRadius.circular(14),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  decoration: BoxDecoration(
+                    color: WalletPalette.surface,
+                    borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: WalletPalette.hairline),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          fullDateLabel(ctrl.combinedDateTime),
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w700,
+                            color: WalletPalette.ink,
+                          ),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      Icon(Icons.event_rounded, color: accent, size: 20),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            // const SizedBox(width: 10),
+            // SizedBox(
+            //   height: 52,
+            //   child: OutlinedButton(
+            //     style: OutlinedButton.styleFrom(
+            //       foregroundColor: accent,
+            //       side: const BorderSide(color: WalletPalette.hairline),
+            //       shape: RoundedRectangleBorder(
+            //         borderRadius: BorderRadius.circular(14),
+            //       ),
+            //       backgroundColor: WalletPalette.surface,
+            //     ),
+            //     onPressed: ctrl.resetToNow,
+            //     child: const Text(
+            //       'Now',
+            //       style: TextStyle(fontWeight: FontWeight.w700),
+            //     ),
+            //   ),
+            // ),
+          ],
+        );
+      default:
+        return TextFormField(
+          controller: title == "Amount" ? ctrl.amountCtrl : ctrl.titleCtrl,
+          keyboardType: title == "Amount"
+              ? const TextInputType.numberWithOptions(decimal: true)
+              : null,
+          inputFormatters: title == "Amount"
+              ? [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                ]
+              : [],
+          style: title == "Amount"
+              ? const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                  color: WalletPalette.ink,
+                )
+              : const TextStyle(),
+          decoration: title == "Amount"
+              ? decoration(accent, hint: '0.00', prefixText: "$currencySymbol ")
+              : decoration(accent, hint: 'e.g. Coffee with a client'),
+          validator: (v) {
+            if (title == "Amount") {
+              final cleaned = v?.replaceAll(',', '').trim() ?? '';
+              if (cleaned.isEmpty) return 'Enter an amount';
+              final parsed = double.tryParse(cleaned);
+              if (parsed == null) return 'Enter a valid number';
+              if (parsed <= 0) return 'Amount must be greater than zero';
+              return null;
+            } else {
+              if (v == null || v.trim().isEmpty) {
+                return "Enter a title";
+              } else {
+                return null;
+              }
+            }
+          },
+        );
+    }
+  }
 }
 
-/// Small uppercase label introducing each field — consistent with the
-/// section labels on the wallet summary screen instead of relying on
-/// Material's floating labelText.
+// ─────────────────────────────────────────────────────────
+// Field label
+// ─────────────────────────────────────────────────────────
+
 class _FieldLabel extends StatelessWidget {
   const _FieldLabel(this.text);
   final String text;
@@ -362,15 +328,16 @@ class _FieldLabel extends StatelessWidget {
         fontSize: 11,
         fontWeight: FontWeight.w800,
         letterSpacing: 1.1,
-        color: Palette.muted,
+        color: WalletPalette.muted,
       ),
     );
   }
 }
 
-/// Expense/Income is a binary, mutually-exclusive choice, so a segmented
-/// toggle is the right control for it — not a dropdown, which implies a
-/// longer list of options the user has to read through.
+// ─────────────────────────────────────────────────────────
+// Type toggle
+// ─────────────────────────────────────────────────────────
+
 class _TypeToggle extends StatelessWidget {
   const _TypeToggle({required this.isExpense, required this.onChanged});
   final bool isExpense;
@@ -381,27 +348,27 @@ class _TypeToggle extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
-        color: Palette.surface,
+        color: WalletPalette.surface,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Palette.hairline),
+        border: Border.all(color: WalletPalette.hairline),
       ),
       child: Row(
         children: [
           Expanded(
-            child: _ToggleSegment(
+            child: _Segment(
               label: 'Expense',
               icon: Icons.call_made_rounded,
-              color: Palette.clay,
+              color: WalletPalette.clay,
               selected: isExpense,
               onTap: () => onChanged(true),
             ),
           ),
           const SizedBox(width: 6),
           Expanded(
-            child: _ToggleSegment(
+            child: _Segment(
               label: 'Income',
               icon: Icons.call_received_rounded,
-              color: Palette.teal,
+              color: WalletPalette.teal,
               selected: !isExpense,
               onTap: () => onChanged(false),
             ),
@@ -412,8 +379,8 @@ class _TypeToggle extends StatelessWidget {
   }
 }
 
-class _ToggleSegment extends StatelessWidget {
-  const _ToggleSegment({
+class _Segment extends StatelessWidget {
+  const _Segment({
     required this.label,
     required this.icon,
     required this.color,
@@ -443,13 +410,13 @@ class _ToggleSegment extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: 16, color: selected ? color : Palette.muted),
+            Icon(icon, size: 16, color: selected ? color : WalletPalette.muted),
             const SizedBox(width: 6),
             Text(
               label,
               style: TextStyle(
                 fontWeight: FontWeight.w700,
-                color: selected ? color : Palette.muted,
+                color: selected ? color : WalletPalette.muted,
               ),
             ),
           ],
@@ -459,45 +426,43 @@ class _ToggleSegment extends StatelessWidget {
   }
 }
 
-/// Live summary card that updates as the user types, so the connection
-/// between type, category, amount and date is visible immediately
-/// instead of only appearing after the form is submitted.
+// ─────────────────────────────────────────────────────────
+// Live preview card
+// ─────────────────────────────────────────────────────────
+
 class _LivePreview extends StatelessWidget {
   const _LivePreview({
     required this.isExpense,
     required this.accent,
     required this.category,
-    required this.amountListenable,
-    required this.titleListenable,
+    required this.amountCtrl,
+    required this.titleCtrl,
     required this.dateLabel,
   });
 
   final bool isExpense;
   final Color accent;
-  final _CategoryOption category;
-  final TextEditingController amountListenable;
-  final TextEditingController titleListenable;
+  final WalletCategory category;
+  final TextEditingController amountCtrl;
+  final TextEditingController titleCtrl;
   final String dateLabel;
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge([amountListenable, titleListenable]),
+      animation: Listenable.merge([amountCtrl, titleCtrl]),
       builder: (context, _) {
-        final cleanedAmount = amountListenable.text.replaceAll(',', '').trim();
-        final parsedAmount = double.tryParse(cleanedAmount);
-        final displayAmount =
-            parsedAmount == null ? '0.00' : parsedAmount.toStringAsFixed(2);
-        final title = titleListenable.text.trim().isEmpty
-            ? 'New entry'
-            : titleListenable.text.trim();
+        final raw = double.tryParse(amountCtrl.text.replaceAll(',', '').trim());
+        final display = raw == null ? '0.00' : raw.toStringAsFixed(2);
+        final title =
+            titleCtrl.text.trim().isEmpty ? 'New entry' : titleCtrl.text.trim();
 
         return Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Palette.surface,
+            color: WalletPalette.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Palette.hairline),
+            border: Border.all(color: WalletPalette.hairline),
           ),
           child: Row(
             children: [
@@ -518,14 +483,18 @@ class _LivePreview extends StatelessWidget {
                     Text(
                       title,
                       style: const TextStyle(
-                          fontWeight: FontWeight.w700, color: Palette.ink),
+                        fontWeight: FontWeight.w700,
+                        color: WalletPalette.ink,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 3),
                     Text(
                       '${category.label} · $dateLabel',
-                      style:
-                          const TextStyle(fontSize: 12, color: Palette.muted),
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: WalletPalette.muted,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
@@ -533,7 +502,7 @@ class _LivePreview extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text(
-                '${isExpense ? '-' : '+'}\$$displayAmount',
+                '${isExpense ? '-' : '+'}\$$display',
                 style: TextStyle(
                   fontWeight: FontWeight.w800,
                   fontSize: 16,

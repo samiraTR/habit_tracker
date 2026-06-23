@@ -1,189 +1,127 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/Core/themes/app_themes.dart';
+import 'package:get/get.dart';
+import 'package:habit_tracker/Core/constants/constants.dart';
+import 'package:habit_tracker/Features/finance/controllers/wallet_controller.dart';
+import 'package:habit_tracker/Features/finance/models/wallet_model.dart';
 
-class CategorySpend {
-  const CategorySpend({
-    required this.label,
-    required this.amount,
-    required this.color,
-    required this.icon,
-  });
+import 'wallet_constants.dart';
 
-  final String label;
-  final double amount;
-  final Color color;
-  final IconData icon;
-}
-
-class WalletTransaction {
-  const WalletTransaction({
-    required this.title,
-    required this.time,
-    required this.day,
-    required this.amount,
-    required this.icon,
-    required this.color,
-  });
-
-  final String title;
-  final String time;
-  final String day;
-  final double amount; // positive = income, negative = expense
-  final IconData icon;
-  final Color color;
-}
+// ─────────────────────────────────────────────────────────
+// Screen
+// ─────────────────────────────────────────────────────────
 
 class FinanceWalletScreen extends StatelessWidget {
-  FinanceWalletScreen({super.key});
-
-  // ---- Source data --------------------------------------------------
-  // Everything below is the single source of truth. Percentages, totals
-  // and progress bars are all derived from these values rather than
-  // hard-coded, so the UI can never silently drift out of sync with the
-  // numbers it's supposed to represent.
-
-  final double _balance = 1280;
-  final double _balanceTrendPercent = 12;
-  final double _income = 180;
-  final double _budgetLimit = 140;
-
-  final List<CategorySpend> _categories = const [
-    CategorySpend(
-      label: 'Food',
-      amount: 45,
-      color: Palette.clay,
-      icon: Icons.local_cafe_rounded,
-    ),
-    CategorySpend(
-      label: 'Transport',
-      amount: 18,
-      color: Palette.slate,
-      icon: Icons.directions_bus_filled_rounded,
-    ),
-    CategorySpend(
-      label: 'Wellness',
-      amount: 30,
-      color: Palette.sage,
-      icon: Icons.spa_rounded,
-    ),
-  ];
-
-  final List<WalletTransaction> _transactions = const [
-    WalletTransaction(
-      title: 'Coffee & notes',
-      time: '10:45 AM',
-      day: 'Today',
-      amount: -8,
-      icon: Icons.local_cafe_rounded,
-      color: Palette.clay,
-    ),
-    WalletTransaction(
-      title: 'Salary top-up',
-      time: '8:20 AM',
-      day: 'Today',
-      amount: 180,
-      icon: Icons.account_balance_wallet_rounded,
-      color: Palette.teal,
-    ),
-    WalletTransaction(
-      title: 'Yoga class',
-      time: '6:00 PM',
-      day: 'Yesterday',
-      amount: -16,
-      icon: Icons.spa_rounded,
-      color: Palette.sage,
-    ),
-  ];
-
-  double get _totalSpent => _categories.fold(0.0, (sum, c) => sum + c.amount);
-
-  Map<String, List<WalletTransaction>> get _transactionsByDay {
-    final map = <String, List<WalletTransaction>>{};
-    for (final t in _transactions) {
-      map.putIfAbsent(t.day, () => []).add(t);
-    }
-    return map;
-  }
+  const FinanceWalletScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final groupedDays = _transactionsByDay;
+    // WalletController is already registered by DashboardScreen.
+    final ctrl = Get.find<WalletController>();
+
+    
 
     return Scaffold(
-      backgroundColor: Palette.bg,
+      backgroundColor: WalletPalette.bg,
       appBar: AppBar(
-        backgroundColor: Palette.bg,
+        backgroundColor: WalletPalette.bg,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: const Text(
           'Wallet',
-          style: TextStyle(fontWeight: FontWeight.w800, color: Palette.ink),
+          style:
+              TextStyle(fontWeight: FontWeight.w800, color: WalletPalette.ink),
         ),
         actions: [
+          InkWell(
+            onTap: () {
+              Get.dialog(
+                Dialog(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text("Set Your Budget Limit"),
+                      Expanded(child: TextFormField())
+                    ],
+                  ),
+                ),
+              );
+            },
+            child: Image.asset(
+              "assets/icons/accounting.png",
+              height: 20,
+              width: 20,
+              scale: 10,
+            ),
+          ),
           IconButton(
-            onPressed: () {},
             icon: const Icon(Icons.notifications_none_rounded,
-                color: Palette.ink),
+                color: WalletPalette.ink),
+            onPressed: () {},
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Palette.teal,
-        onPressed: () {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Add a transaction')),
-          );
-        },
-        child: const Icon(Icons.add_rounded),
-      ),
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: WalletPalette.teal,
+      //   onPressed: () => Get.toNamed('/walletEntry'),
+      //   child: const Icon(Icons.add_rounded),
+      // ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 4, 18, 100),
-          children: [
-            _BalanceHero(
-              balance: _balance,
-              trendPercent: _balanceTrendPercent,
-              income: _income,
-              spent: _totalSpent,
-            ),
-            const SizedBox(height: 28),
-            const _SectionLabel('Spending overview'),
-            const SizedBox(height: 14),
-            _SpendingCard(
-              categories: _categories,
-              totalSpent: _totalSpent,
-              budgetLimit: _budgetLimit,
-            ),
-            const SizedBox(height: 28),
-            const _SectionLabel('Recent activity'),
-            const SizedBox(height: 14),
-            for (final day in groupedDays.keys) ...[
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8, left: 4),
-                child: Text(
-                  day,
-                  style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.6,
-                    color: Palette.muted,
-                  ),
-                ),
+        child: Obx(() {
+          final breakdown = ctrl.expenseBreakdown;
+          final groupedDays = ctrl.entriesByDay;
+
+          return ListView(
+            padding: const EdgeInsets.fromLTRB(18, 4, 18, 100),
+            children: [
+              _BalanceHero(
+                balance: ctrl.balance,
+                income: ctrl.totalIncome,
+                spent: ctrl.totalSpent,
               ),
-              _TransactionGroup(transactions: groupedDays[day]!),
-              const SizedBox(height: 18),
+              const SizedBox(height: 28),
+              const _SectionLabel('Spending overview'),
+              const SizedBox(height: 14),
+              _SpendingCard(
+                breakdown: breakdown,
+                totalSpent: ctrl.totalSpent,
+                budgetLimit: kMonthlyBudget,
+              ),
+              const SizedBox(height: 28),
+              const _SectionLabel('Recent activity'),
+              const SizedBox(height: 14),
+              if (groupedDays.isEmpty)
+                _EmptyActivity(onAdd: () => Get.toNamed('/walletEntry'))
+              else
+                for (final day in groupedDays.keys) ...[
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 8, left: 4),
+                    child: Text(
+                      day,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.6,
+                        color: WalletPalette.muted,
+                      ),
+                    ),
+                  ),
+                  _TransactionGroup(transactions: groupedDays[day]!),
+                  const SizedBox(height: 18),
+                ],
             ],
-          ],
-        ),
+          );
+        }),
       ),
     );
   }
 }
 
-/// Small uppercase eyebrow label used to introduce each section — the
-/// grouping it sits above genuinely is a distinct category of content,
-/// so the label is doing real structural work, not just decoration.
+// ─────────────────────────────────────────────────────────
+// Section label
+// ─────────────────────────────────────────────────────────
+
 class _SectionLabel extends StatelessWidget {
   const _SectionLabel(this.text);
   final String text;
@@ -196,41 +134,44 @@ class _SectionLabel extends StatelessWidget {
         fontSize: 12,
         fontWeight: FontWeight.w800,
         letterSpacing: 1.4,
-        color: Palette.muted,
+        color: WalletPalette.muted,
       ),
     );
   }
 }
 
-/// The hero card: balance, trend, and an at-a-glance income/spent split,
-/// all visible without scrolling.
+// ─────────────────────────────────────────────────────────
+// Hero balance card
+// ─────────────────────────────────────────────────────────
+
 class _BalanceHero extends StatelessWidget {
   const _BalanceHero({
     required this.balance,
-    required this.trendPercent,
     required this.income,
     required this.spent,
   });
 
   final double balance;
-  final double trendPercent;
   final double income;
   final double spent;
 
   @override
   Widget build(BuildContext context) {
+    final net = income - spent;
+    final isPositive = net >= 0;
+
     return Container(
       padding: const EdgeInsets.fromLTRB(22, 24, 22, 20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Palette.teal, Palette.tealDark],
+          colors: [WalletPalette.teal, WalletPalette.tealDark],
         ),
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: Palette.teal.withValues(alpha: 0.28),
+            color: WalletPalette.teal.withValues(alpha: 0.28),
             blurRadius: 24,
             offset: const Offset(0, 14),
           ),
@@ -262,7 +203,7 @@ class _BalanceHero extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
-                    '\$${balance.toStringAsFixed(0)}',
+                    "$currencySymbol ${balance.toStringAsFixed(0)}",
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 36,
@@ -284,11 +225,16 @@ class _BalanceHero extends StatelessWidget {
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          const Icon(Icons.arrow_upward_rounded,
-                              size: 13, color: Colors.white),
+                          Icon(
+                            isPositive
+                                ? Icons.arrow_upward_rounded
+                                : Icons.arrow_downward_rounded,
+                            size: 13,
+                            color: Colors.white,
+                          ),
                           const SizedBox(width: 2),
                           Text(
-                            '${trendPercent.toStringAsFixed(0)}%',
+                            '${isPositive ? '+' : '-'} $currencySymbol ${net.abs().toStringAsFixed(0)} net',
                             style: const TextStyle(
                               color: Colors.white,
                               fontSize: 12,
@@ -305,7 +251,9 @@ class _BalanceHero extends StatelessWidget {
               Text(
                 'this month',
                 style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.6), fontSize: 13),
+                  color: Colors.white.withValues(alpha: 0.6),
+                  fontSize: 13,
+                ),
               ),
               const SizedBox(height: 20),
               Container(height: 1, color: Colors.white.withValues(alpha: 0.16)),
@@ -321,9 +269,10 @@ class _BalanceHero extends StatelessWidget {
                     ),
                   ),
                   Container(
-                      width: 1,
-                      height: 36,
-                      color: Colors.white.withValues(alpha: 0.16)),
+                    width: 1,
+                    height: 36,
+                    color: Colors.white.withValues(alpha: 0.16),
+                  ),
                   Expanded(
                     child: _HeroStat(
                       icon: Icons.call_made_rounded,
@@ -376,14 +325,17 @@ class _HeroStat extends StatelessWidget {
               Text(
                 label,
                 style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.65), fontSize: 12),
+                  color: Colors.white.withValues(alpha: 0.65),
+                  fontSize: 12,
+                ),
               ),
               Text(
-                '${positive ? '+' : '-'}\$${amount.toStringAsFixed(0)}',
+                '${positive ? '+' : '-'} $currencySymbol ${amount.toStringAsFixed(0)}',
                 style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15),
+                  color: Colors.white,
+                  fontWeight: FontWeight.w700,
+                  fontSize: 15,
+                ),
               ),
             ],
           ),
@@ -393,28 +345,27 @@ class _HeroStat extends StatelessWidget {
   }
 }
 
-/// Budget ring + category breakdown, sharing one card so the percentage
-/// in the middle and the bars underneath always agree with each other.
+// ─────────────────────────────────────────────────────────
+// Spending card with budget ring
+// ─────────────────────────────────────────────────────────
+
 class _SpendingCard extends StatelessWidget {
   const _SpendingCard({
-    required this.categories,
+    required this.breakdown,
     required this.totalSpent,
     required this.budgetLimit,
   });
 
-  final List<CategorySpend> categories;
+  final List<MapEntry<WalletCategory, double>> breakdown;
   final double totalSpent;
   final double budgetLimit;
 
   @override
   Widget build(BuildContext context) {
-    final usedFraction =
-        budgetLimit <= 0 ? 0.0 : (totalSpent / budgetLimit).clamp(0.0, 1.0);
-
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Palette.surface,
+        color: WalletPalette.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -431,7 +382,10 @@ class _SpendingCard extends StatelessWidget {
             duration: const Duration(milliseconds: 900),
             curve: Curves.easeOutCubic,
             builder: (context, value, _) {
-              final animatedPercent = (usedFraction * value * 100).round();
+              final used = budgetLimit <= 0
+                  ? 0.0
+                  : (totalSpent / budgetLimit).clamp(0.0, 1.0);
+              final pct = (used * value * 100).round();
               return SizedBox(
                 width: 168,
                 height: 168,
@@ -441,30 +395,32 @@ class _SpendingCard extends StatelessWidget {
                     CustomPaint(
                       size: const Size(168, 168),
                       painter: _BudgetRingPainter(
-                        categories: categories,
+                        breakdown: breakdown,
                         totalSpent: totalSpent,
                         budgetLimit: budgetLimit,
                         progress: value,
-                        trackColor: Palette.hairline,
+                        trackColor: WalletPalette.hairline,
                       ),
                     ),
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                          '$animatedPercent%',
+                          '$pct%',
                           style: const TextStyle(
                             fontSize: 28,
                             fontWeight: FontWeight.w800,
-                            color: Palette.ink,
+                            color: WalletPalette.ink,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'of \$${budgetLimit.toStringAsFixed(0)} budget',
+                          'of $currencySymbol ${budgetLimit.toStringAsFixed(0)} budget',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                              fontSize: 12, color: Palette.muted),
+                            fontSize: 12,
+                            color: WalletPalette.muted,
+                          ),
                         ),
                       ],
                     ),
@@ -474,99 +430,109 @@ class _SpendingCard extends StatelessWidget {
             },
           ),
           const SizedBox(height: 20),
-          Column(
-            children: [
-              for (var i = 0; i < categories.length; i++) ...[
-                _CategoryRow(
-                  category: categories[i],
-                  share:
-                      totalSpent <= 0 ? 0.0 : categories[i].amount / totalSpent,
-                ),
-                if (i != categories.length - 1) const SizedBox(height: 14),
+          if (breakdown.isEmpty)
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 6),
+              child: Text(
+                'No expenses yet this month.',
+                style: TextStyle(color: WalletPalette.muted),
+              ),
+            )
+          else
+            Column(
+              children: [
+                for (var i = 0; i < breakdown.length; i++) ...[
+                  _CategoryRow(
+                    category: breakdown[i].key,
+                    amount: breakdown[i].value,
+                    share:
+                        totalSpent <= 0 ? 0.0 : breakdown[i].value / totalSpent,
+                  ),
+                  if (i != breakdown.length - 1) const SizedBox(height: 14),
+                ],
               ],
-            ],
-          ),
+            ),
         ],
       ),
     );
   }
 }
 
-/// Multi-segment ring: the filled portion represents budget used, and
-/// each category's slice of that portion is proportional to its actual
-/// share of spending — so the ring and the rows beneath it can never
-/// tell two different stories.
 class _BudgetRingPainter extends CustomPainter {
-  _BudgetRingPainter({
-    required this.categories,
+  const _BudgetRingPainter({
+    required this.breakdown,
     required this.totalSpent,
     required this.budgetLimit,
     required this.progress,
     required this.trackColor,
   });
 
-  final List<CategorySpend> categories;
+  final List<MapEntry<WalletCategory, double>> breakdown;
   final double totalSpent;
   final double budgetLimit;
   final double progress;
   final Color trackColor;
 
   static const double _strokeWidth = 14;
-  static const double _gapRadians = 0.05;
+  static const double _gap = 0.05;
 
   @override
   void paint(Canvas canvas, Size size) {
     final center = size.center(Offset.zero);
     final radius = (size.shortestSide - _strokeWidth) / 2;
 
-    final trackPaint = Paint()
-      ..color = trackColor
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = _strokeWidth
-      ..strokeCap = StrokeCap.round;
-    canvas.drawCircle(center, radius, trackPaint);
+    canvas.drawCircle(
+      center,
+      radius,
+      Paint()
+        ..color = trackColor
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = _strokeWidth
+        ..strokeCap = StrokeCap.round,
+    );
 
     if (totalSpent <= 0 || budgetLimit <= 0) return;
 
-    final usedFraction = (totalSpent / budgetLimit).clamp(0.0, 1.0);
-    final totalSweep = 2 * math.pi * usedFraction * progress;
+    final totalSweep =
+        2 * math.pi * (totalSpent / budgetLimit).clamp(0.0, 1.0) * progress;
+    var start = -math.pi / 2;
 
-    double startAngle = -math.pi / 2;
-    for (final category in categories) {
-      final share = category.amount / totalSpent;
-      final rawSweep = totalSweep * share;
-      final sweep = (rawSweep - _gapRadians).clamp(0.0, rawSweep);
-
+    for (final entry in breakdown) {
+      final rawSweep = totalSweep * (entry.value / totalSpent);
+      final sweep = (rawSweep - _gap).clamp(0.0, rawSweep);
       if (sweep > 0) {
-        final segmentPaint = Paint()
-          ..color = category.color
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = _strokeWidth
-          ..strokeCap = StrokeCap.round;
         canvas.drawArc(
           Rect.fromCircle(center: center, radius: radius),
-          startAngle,
+          start,
           sweep,
           false,
-          segmentPaint,
+          Paint()
+            ..color = entry.key.color
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = _strokeWidth
+            ..strokeCap = StrokeCap.round,
         );
       }
-      startAngle += rawSweep;
+      start += rawSweep;
     }
   }
 
   @override
-  bool shouldRepaint(covariant _BudgetRingPainter oldDelegate) {
-    return oldDelegate.progress != progress ||
-        oldDelegate.totalSpent != totalSpent ||
-        oldDelegate.budgetLimit != budgetLimit;
-  }
+  bool shouldRepaint(covariant _BudgetRingPainter old) =>
+      old.progress != progress ||
+      old.totalSpent != totalSpent ||
+      old.breakdown.length != breakdown.length;
 }
 
 class _CategoryRow extends StatelessWidget {
-  const _CategoryRow({required this.category, required this.share});
+  const _CategoryRow({
+    required this.category,
+    required this.amount,
+    required this.share,
+  });
 
-  final CategorySpend category;
+  final WalletCategory category;
+  final double amount;
   final double share;
 
   @override
@@ -593,13 +559,15 @@ class _CategoryRow extends StatelessWidget {
                   Text(
                     category.label,
                     style: const TextStyle(
-                        fontWeight: FontWeight.w700, color: Palette.ink),
+                      fontWeight: FontWeight.w700,
+                      color: WalletPalette.ink,
+                    ),
                   ),
                   Text(
-                    '\$${category.amount.toStringAsFixed(0)}',
+                    '$currencySymbol' '${amount.toStringAsFixed(0)}',
                     style: const TextStyle(
                       fontWeight: FontWeight.w700,
-                      color: Palette.ink,
+                      color: WalletPalette.ink,
                       fontFeatures: [FontFeature.tabularFigures()],
                     ),
                   ),
@@ -611,7 +579,7 @@ class _CategoryRow extends StatelessWidget {
                 child: LinearProgressIndicator(
                   value: share,
                   minHeight: 6,
-                  backgroundColor: Palette.hairline,
+                  backgroundColor: WalletPalette.hairline,
                   valueColor: AlwaysStoppedAnimation(category.color),
                 ),
               ),
@@ -623,19 +591,19 @@ class _CategoryRow extends StatelessWidget {
   }
 }
 
-/// One rounded card per day, with hairline dividers between rows instead
-/// of stacking a heavy shadowed card per transaction — quieter, and it
-/// reads the grouping (same day) as one connected list rather than three
-/// unrelated boxes.
+// ─────────────────────────────────────────────────────────
+// Transaction list
+// ─────────────────────────────────────────────────────────
+
 class _TransactionGroup extends StatelessWidget {
   const _TransactionGroup({required this.transactions});
-  final List<WalletTransaction> transactions;
+  final List<WalletEntry> transactions;
 
   @override
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Palette.surface,
+        color: WalletPalette.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -648,13 +616,14 @@ class _TransactionGroup extends StatelessWidget {
       child: Column(
         children: [
           for (var i = 0; i < transactions.length; i++) ...[
-            _TransactionTile(transaction: transactions[i]),
+            _TransactionTile(entry: transactions[i]),
             if (i != transactions.length - 1)
               const Divider(
-                  height: 1,
-                  indent: 68,
-                  endIndent: 16,
-                  color: Palette.hairline),
+                height: 1,
+                indent: 68,
+                endIndent: 16,
+                color: WalletPalette.hairline,
+              ),
           ],
         ],
       ),
@@ -663,12 +632,12 @@ class _TransactionGroup extends StatelessWidget {
 }
 
 class _TransactionTile extends StatelessWidget {
-  const _TransactionTile({required this.transaction});
-  final WalletTransaction transaction;
+  const _TransactionTile({required this.entry});
+  final WalletEntry entry;
 
   @override
   Widget build(BuildContext context) {
-    final isIncome = transaction.amount > 0;
+    final cat = entry.category;
     return Padding(
       padding: const EdgeInsets.all(14),
       child: Row(
@@ -677,10 +646,10 @@ class _TransactionTile extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: BoxDecoration(
-              color: transaction.color.withValues(alpha: 0.14),
+              color: cat.color.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(transaction.icon, color: transaction.color, size: 19),
+            child: Icon(cat.icon, color: cat.color, size: 19),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -688,27 +657,58 @@ class _TransactionTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  transaction.title,
+                  entry.title,
                   style: const TextStyle(
-                      fontWeight: FontWeight.w700, color: Palette.ink),
+                    fontWeight: FontWeight.w700,
+                    color: WalletPalette.ink,
+                  ),
                 ),
                 const SizedBox(height: 3),
                 Text(
-                  transaction.time,
-                  style: const TextStyle(color: Palette.muted, fontSize: 12.5),
+                  timeLabel(entry.date),
+                  style: const TextStyle(
+                    color: WalletPalette.muted,
+                    fontSize: 12.5,
+                  ),
                 ),
               ],
             ),
           ),
           Text(
-            '${isIncome ? '+' : '-'}\$${transaction.amount.abs().toStringAsFixed(0)}',
+            '${entry.isIncome ? '+' : '-'}\$${entry.amount.abs().toStringAsFixed(0)}',
             style: TextStyle(
               fontWeight: FontWeight.w700,
-              color: isIncome ? Palette.teal : Palette.ink,
+              color: entry.isIncome ? WalletPalette.teal : WalletPalette.ink,
               fontFeatures: const [FontFeature.tabularFigures()],
             ),
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _EmptyActivity extends StatelessWidget {
+  const _EmptyActivity({required this.onAdd});
+  final VoidCallback onAdd;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onAdd,
+      child: Container(
+        padding: const EdgeInsets.all(24),
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: WalletPalette.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: WalletPalette.hairline),
+        ),
+        child: const Text(
+          'No activity yet — tap + to add your first entry.',
+          style: TextStyle(color: WalletPalette.muted),
+          textAlign: TextAlign.center,
+        ),
       ),
     );
   }
